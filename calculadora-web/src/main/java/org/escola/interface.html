@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Calculadora Web</title>
+</head>
+<body>
+<h1>Calculadora</h1>
+<input type="number" id="numero1">
+<input type="number" id="numero2">
+<button onclick="somar()">Somar</button>
+<p id="resultado"></p>
+<script>
+    function somar() {
+    let n1 = parseFloat(document.getElementById("numero1").value);
+    let n2 = parseFloat(document.getElementById("numero2").value);
+
+    Página 4 de 5
+
+    let resultado = n1 + n2;
+    document.getElementById("resultado").innerHTML =
+    "Resultado: " + resultado;
+    }
+</script>
+</body>
+</html>
