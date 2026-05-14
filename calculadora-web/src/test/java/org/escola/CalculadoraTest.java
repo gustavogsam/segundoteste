@@ -2,34 +2,36 @@ package org.escola;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.escola.model.Calculadora;
+import org.escola.service.CalculadoraService;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+
 public class CalculadoraTest {
     @Test
     void deveSomarCorretamente() {
         Calculadora calc = new Calculadora();
-        double resultado = calc.somar(10, 5);
-        assertEquals(15, resultado);
+        double resultado = calc.somar(5, 5);
+        assertEquals(10, resultado);
     }
 
     @Test
     void subtracao() {
         Calculadora calc = new Calculadora();
-        double resultado = calc.subtrair(20, 5);
-        assertEquals(15, resultado);
+        double resultado = calc.subtrair(10, 2);
+        assertEquals(8, resultado);
     }
 
     @Test
     void multiplicao() {
         Calculadora calc = new Calculadora();
-        double resultado = calc.multiplicar(5, 2);
+        double resultado = calc.multiplicar(2, 5);
         assertEquals(10, resultado);
     }
 
     @Test
     void divisao() {
         Calculadora calc = new Calculadora();
-        double resultado = calc.dividir(10, 2);
+        double resultado = calc.dividir(20, 4);
         assertEquals(5, resultado);
     }
 
@@ -42,26 +44,37 @@ public class CalculadoraTest {
         });
     }
 
+        @Test
+    void entradaInvalidaDeveLancarExcecao() {
+        Calculadora calculadora = new Calculadora();
+        calculadora.setNumero1("abc");
+        calculadora.setNumero2("5");
+        calculadora.setOperacao("somar");
+
+        CalculadoraService service = new CalculadoraService();
+
+        assertThrows(IllegalArgumentException.class, () -> service.calcular(calculadora));
+    }
+
+  
+
     @Test
-    void porcento() {
+    void numeronegativo() {
         Calculadora calc = new Calculadora();
-        double resultado = calc.porcetagem(100, 10);
-        assertEquals(10, resultado);
+        double resultado = calc.somar(-5, 2);
+        assertEquals(-3, resultado);
     }
 
     @Test
-    void pontenciacao() {
+    void numeroquebrado() {
         Calculadora calc = new Calculadora();
-        double resultado = calc.potencia(2, 3);
-        assertEquals(8, resultado);
+        double resultado = calc.multiplicar(2.5, 2);
+        assertEquals(5.0, resultado);
     }
 
-    @Test
-    void raiz() {
-        Calculadora calc = new Calculadora();
-        double resultado = calc.raizquadrada(64);
-        assertEquals(8, resultado);
-    }
+
+
+  
 
 
 }

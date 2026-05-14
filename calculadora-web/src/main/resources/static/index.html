@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Web</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px;
+            padding-top: 30px;
+        }
+
+        .wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #555;
+            font-weight: 500;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .btn-calculate {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-calculate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-calculate:active {
+            transform: translateY(0);
+        }
+
+        .result-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .result-section.show {
+            display: block;
+        }
+
+        .result-label {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .result-value {
+            font-size: 32px;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .error-message {
+            margin-top: 20px;
+            padding: 15px;
+            background: #ffebee;
+            color: #c62828;
+            border-radius: 8px;
+            border-left: 4px solid #c62828;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .btn-clear {
+            width: 100%;
+            padding: 10px;
+            background: #f0f0f0;
+            color: #333;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+
+        .btn-clear:hover {
+            background: #e0e0e0;
+        }
+
+        .info-text {
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+            margin-top: 15px;
+        }
+
+        .historico-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .historico-container h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        .historico-item {
+            padding: 12px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .historico-item-operacao {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .historico-item-resultado {
+            color: #764ba2;
+            font-weight: bold;
+            margin-top: 4px;
+        }
+
+        .historico-item-hora {
+            color: #999;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .historico-vazio {
+            text-align: center;
+            color: #ccc;
+            padding: 40px 20px;
+        }
+
+        @media (max-width: 768px) {
+            .wrapper {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="container">
+            <h1>🧮 Calculadora</h1>
+
+        <div class="form-group">
+            <label for="operacao">Operação</label>
+            <select id="operacao" onchange="atualizarLabel()">
+                <option value="">Selecione uma operação</option>
+                <option value="somar">Somar (+)</option>
+                <option value="subtrair">Subtrair (-)</option>
+                <option value="multiplicar">Multiplicar (×)</option>
+                <option value="dividir">Dividir (÷)</option>
+                <option value="potencia">Potência (x^y)</option>
+                <option value="porcentagem">Porcentagem (%)</option>
+                <option value="raiz">Raiz Quadrada (√)</option>
+            </select>
+        </div>
+
+        <div class="input-row">
+            <div class="form-group">
+                <label for="numero1" id="label-numero1">Número 1</label>
+                <input type="text" id="numero1" placeholder="Digite um número">
+            </div>
+            <div class="form-group">
+                <label for="numero2" id="label-numero2">Número 2</label>
+                <input type="text" id="numero2" placeholder="Digite um número">
+            </div>
+        </div>
+
+        <button class="btn-calculate" onclick="calcular()">Calcular</button>
+        <button class="btn-clear" onclick="limpar()">Limpar</button>
+
+        <div class="error-message" id="erro"></div>
+
+        <div class="result-section" id="resultSection">
+            <div class="result-label">Resultado:</div>
+            <div class="result-value" id="resultado">0</div>
+        </div>
+
+        <div class="info-text">
+            Todos os números devem ser válidos. Use ponto ou vírgula como separador decimal.
+        </div>
+        </div>
+
+        <div class="historico-container">
+            <h2>📋 Histórico</h2>
+            <div id="historico"></div>
+        </div>
+    </div>
+
+    <script>
+        function atualizarLabel() {
+            const operacao = document.getElementById('operacao').value;
+            const label1 = document.getElementById('label-numero1');
+            const label2 = document.getElementById('label-numero2');
+            const numero2 = document.getElementById('numero2');
+
+            if (operacao === 'raiz') {
+                label1.textContent = 'Número';
+                label2.textContent = 'Número 2';
+                numero2.style.display = 'none';
+                numero2.parentElement.style.display = 'none';
+            } else {
+                label1.textContent = 'Número 1';
+                label2.textContent = 'Número 2';
+                numero2.style.display = 'block';
+                numero2.parentElement.style.display = 'block';
+            }
+        }
+
+        function calcular() {
+            const operacao = document.getElementById('operacao').value;
+            const numero1 = document.getElementById('numero1').value;
+            const numero2 = document.getElementById('numero2').value;
+            const erroDiv = document.getElementById('erro');
+            const resultSection = document.getElementById('resultSection');
+
+            // Validações
+            if (!operacao) {
+                mostrarErro('Selecione uma operação');
+                return;
+            }
+
+            if (!numero1) {
+                mostrarErro('Digite o número 1');
+                return;
+            }
+
+            if (operacao !== 'raiz' && !numero2) {
+                mostrarErro('Digite o número 2');
+                return;
+            }
+
+            const payload = {
+                operacao: operacao,
+                numero1: numero1,
+                numero2: numero2 || null
+            };
+
+            fetch('/calculadora', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(text);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                erroDiv.classList.remove('show');
+                resultSection.classList.add('show');
+                document.getElementById('resultado').textContent = data.resultado.toFixed(2);
+                carregarHistorico();
+            })
+            .catch(error => {
+                resultSection.classList.remove('show');
+                mostrarErro(error.message || 'Erro ao processar a requisição');
+            });
+        }
+
+        function mostrarErro(mensagem) {
+            const erroDiv = document.getElementById('erro');
+            const resultSection = document.getElementById('resultSection');
+            
+            erroDiv.textContent = '⚠️ ' + mensagem;
+            erroDiv.classList.add('show');
+            resultSection.classList.remove('show');
+        }
+
+        function limpar() {
+            document.getElementById('operacao').value = '';
+            document.getElementById('numero1').value = '';
+            document.getElementById('numero2').value = '';
+            document.getElementById('numero1').focus();
+            document.getElementById('erro').classList.remove('show');
+            document.getElementById('resultSection').classList.remove('show');
+            atualizarLabel();
+        }
+
+        // Permitir Enter para calcular
+        document.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                calcular();
+            }
+        });
+
+        function carregarHistorico() {
+            fetch('/calculadora', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => {
+                console.log('Status:', response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Histórico carregado:', data);
+                const historicoDiv = document.getElementById('historico');
+                historicoDiv.innerHTML = '';
+
+                if (!Array.isArray(data) || data.length === 0) {
+                    historicoDiv.innerHTML = '<div class="historico-vazio">Nenhum cálculo realizado ainda</div>';
+                    return;
+                }
+
+                // Exibir em ordem reversa (últimos primeiros)
+                const dataOrdenada = [...data].reverse();
+                dataOrdenada.forEach(item => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'historico-item';
+
+                    let expressao = '';
+                    if (item.operacao === 'raiz') {
+                        expressao = `√${item.numero1} = ${item.resultado.toFixed(2)}`;
+                    } else {
+                        const simbolo = getSimboloOperacao(item.operacao);
+                        expressao = `${item.numero1} ${simbolo} ${item.numero2} = ${item.resultado.toFixed(2)}`;
+                    }
+
+                    let horaFormatada = 'N/A';
+                    if (item.dataHora) {
+                        horaFormatada = new Date(item.dataHora).toLocaleString('pt-BR');
+                    }
+
+                    itemDiv.innerHTML = `
+                        <div class="historico-item-operacao">${expressao}</div>
+                        <div class="historico-item-hora">${horaFormatada}</div>
+                    `;
+                    historicoDiv.appendChild(itemDiv);
+                });
+            })
+            .catch(error => {
+                console.error('Erro ao carregar histórico:', error);
+                const historicoDiv = document.getElementById('historico');
+                historicoDiv.innerHTML = '<div class="historico-vazio">⚠️ Erro ao carregar histórico</div>';
+            });
+        }
+
+        function getSimboloOperacao(operacao) {
+            const simbolos = {
+                'somar': '+',
+                'subtrair': '-',
+                'multiplicar': '×',
+                'dividir': '÷',
+                'potencia': '^',
+                'porcentagem': '%'
+            };
+            return simbolos[operacao] || operacao;
+        }
+
+        // Carregar histórico ao abrir a página
+        window.addEventListener('load', function() {
+            carregarHistorico();
+        });
+    </script>
+</body>
+</html>
